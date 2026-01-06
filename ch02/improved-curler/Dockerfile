@@ -1,0 +1,14 @@
+FROM ubuntu:24.04
+
+# Update package lists and install curl in a single layer
+RUN apt-get update && \
+    apt-get -y install curl
+
+# Copy the script to the container
+COPY script.sh /script.sh
+
+# Ensure the script is executable
+RUN chmod +x /script.sh
+
+# Run the script when the container starts
+ENTRYPOINT ["./script.sh"]
