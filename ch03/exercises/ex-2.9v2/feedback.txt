@@ -1,0 +1,20 @@
+I was unable to solve this exercise. It appears that even the official
+solution does not work as intended.
+
+The frontend buttons were sending requests to
+GET http://localhost:8080/ping instead of the expected
+GET http://localhost/api/ping.
+
+Consequently, the application only functions if the ports are
+explicitly mapped in the backend service configuration like this:
+ports:
+  - 8080:8080
+
+If I remove the port mapping, the behavior is as follows:
+  Direct port request:
+         curl "http://localhost:8080/ping?redis=true"
+  fails with a connection error.
+
+  Proxy/Route request:
+        curl "http://localhost/api/ping?redis=true"
+  returns 'pong' successfully.
