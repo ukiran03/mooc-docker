@@ -1,0 +1,22 @@
+FROM node:16-alpine
+
+EXPOSE 5000
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN apt install -y nodejs && node -v && npm -v \
+    apt-get purge -y --auto-remove curl &&  \
+    rm -rf /var/lib/apt/lists/* && \
+    npm install &&  npm run build &&  npm install -g serve && \
+    useradd -m appuser &&  chown appuser .
+
+USER appuser
+
+# Serve
+CMD ["serve", "-s", "-l", "5000", "build"]
+
+# Size V0 : 648MB
+# Size V1 : 523MB
+# Size V2 : 450MB

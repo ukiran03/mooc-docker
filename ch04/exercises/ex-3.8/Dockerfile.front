@@ -1,0 +1,22 @@
+FROM node:16-alpine AS builder
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+FROM node:16-alpine
+
+RUN adduser -S appuser && npm install -g serve
+
+WORKDIR /usr/src/app
+
+COPY --from=builder --chown=appuser /usr/src/app/build ./build
+
+USER appuser
+
+EXPOSE 5000
+
+CMD ["serve", "-s", "-l", "5000", "build"]

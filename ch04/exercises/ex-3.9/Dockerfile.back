@@ -1,0 +1,42 @@
+# STAGE 1: Build
+FROM golang:1.25-alpine AS builder
+
+# Install build dependencies if needed (e.g., git, ca-certificates)
+RUN apk add --no-cache ca-certificates
+
+WORKDIR /usr/src/app
+
+# Copy dependency files first to leverage Docker caching
+COPY go.mod go.sum* ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the binary
+# - CGO_ENABLED=0: Ensures the binary is statically linked
+# - -ldflags="-s -w": Strips debug info to reduce binary size
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o server .
+
+# Run tests (Build will fail if tests fail)
+RUN go test ./...
+
+# Create a non-root user for the final image
+RUN echo "appuser:x:10001:10001:appuser:/:" > /etc_passwd
+
+# STAGE 2: Runtime
+FROM scratch
+
+# Import the user definition from the builder
+COPY --from=builder /etc_passwd /etc/passwd
+# Import SSL certificates so your app can make HTTPS calls
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# Copy the compiled binary from the builder stage
+COPY --from=builder /usr/src/app/server /server
+
+USER appuser
+
+EXPOSE 8080
+
+ENTRYPOINT ["/server"]
