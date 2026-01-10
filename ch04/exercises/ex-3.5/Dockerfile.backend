@@ -1,0 +1,22 @@
+FROM alpine
+
+EXPOSE 8080
+
+WORKDIR /usr/src/app
+
+RUN apk update && apk add go
+
+RUN go version
+
+COPY . .
+
+RUN go build
+
+RUN go test ./...
+
+# USER
+RUN adduser -D appuser
+RUN chown appuser .
+USER appuser
+
+CMD ["./server"]
