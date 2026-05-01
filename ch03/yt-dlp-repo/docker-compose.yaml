@@ -1,4 +1,0 @@
-services:
-  yt-dlp-ubuntu:
-    image: ushakiran369/yt-dlp
-    build: .
