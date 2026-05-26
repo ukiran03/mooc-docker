@@ -1,0 +1,9 @@
+services:
+  frontend:
+    image: exampl-frontend:latest
+    ports:
+      - "5001:5001"
+  backend:
+    image: exampl-backend:latest
+    ports:
+      - "8080:8080"

@@ -1,0 +1,19 @@
+services:
+  frontend:
+    image: exampl-frontend:latest
+    # NOTE: In the frontend container image, change http://localhost:8080/api
+    # to http://backend:8080/api, This tells the frontend container to route to
+    # the backend container over the shared Docker network
+    ports:
+      - "5001:5001"    # Exposed to the host/user
+    networks:
+      - app_net        # Connected only to our custom network
+
+  backend:
+    image: exampl-backend:latest
+    # No ports block = 100% hidden from the host/internet
+    networks:
+      - app_net        # Connected only to our custom network
+
+networks:
+  app_net:
