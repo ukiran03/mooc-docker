@@ -1,0 +1,41 @@
+FROM ubuntu:latest
+
+# Prevent apt from hanging waiting for user input/timezone selection
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get -y install curl
+
+WORKDIR /usr/src/app
+
+# Node installation
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+
+RUN apt-get install -y nodejs
+
+RUN node -v && npm -v
+
+# Copy package files
+COPY package*.json ./
+
+# Install npm packages
+RUN npm install
+
+# Copy the rest of the files
+COPY . .
+
+# Build the static files dir
+RUN npm run build
+
+# Install npm serve pkg globally
+RUN npm install -g serve
+
+# Expose the application port
+EXPOSE 5001
+
+# Serve the project as initial command
+CMD ["serve", "-s", "-l", "5001", "build"]
+
+## Running
+# docker build -f Dockerfile -t exampl-frontend .
+# docker run -p 5001:5001 exampl-frontend:latest
