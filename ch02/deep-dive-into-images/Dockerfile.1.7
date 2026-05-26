@@ -1,0 +1,14 @@
+FROM ubuntu:24.04
+
+# Update package lists and install curl in a single layer
+RUN apt-get update && \
+    apt-get -y install curl
+
+WORKDIR /usr/src/app
+
+# becomes /usr/src/app/script.sh
+COPY script.sh .
+
+RUN chmod +x script.sh
+
+CMD ["./script.sh"]
