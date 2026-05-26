@@ -1,5 +1,0 @@
-# Ignore everything inside the directory, but not the directory itself
-/example-frontend/*
-
-# Exception: Do not ignore the Dockerfile
-!/example-frontend/Dockerfile
