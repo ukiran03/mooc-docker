@@ -1,0 +1,39 @@
+FROM ubuntu:latest
+
+# Prevent apt from hanging waiting for user input/timezone selection
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get -y install curl
+
+WORKDIR /usr/src/app
+
+# Node installation
+RUN curl -sL https://deb.nodesource.com/setup_16.x | bash -
+RUN apt-get install -y nodejs
+RUN node -v && npm -v
+
+# Copy package files
+COPY package*.json ./
+
+# Install npm packages
+RUN npm install
+
+# Copy the rest of the files
+COPY . .
+
+# --- FIX IS HERE ---
+# Change this from http://localhost:8080 to just /api
+ENV REACT_APP_BACKEND_URL="/api"
+
+# Build the static files dir (React will now bake "/api" into the build)
+RUN npm run build
+
+# Install npm serve pkg globally
+RUN npm install -g serve
+
+# Expose the application port
+EXPOSE 5001
+
+# Serve the project as initial command
+CMD ["serve", "-s", "-l", "5001", "build"]
